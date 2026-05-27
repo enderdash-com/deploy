@@ -1,13 +1,13 @@
 # EnderDash deploy
 
-Public deployment manifests and examples for the EnderDash standalone agent.
+Public deployment files for the EnderDash standalone agent.
 
-Use the generated agent key from your EnderDash server setup page wherever the
-examples use `<agentKey>`.
+Before you begin, copy the agent key from your EnderDash server setup page.
+Replace `<agentKey>` in the examples with that value.
 
 ## Docker Compose
 
-Download the Compose file, set the agent key, and start the agent:
+To run the agent with Docker Compose:
 
 ```bash
 curl -fsSLO https://raw.githubusercontent.com/enderdash-com/deploy/main/agent/compose.yaml
@@ -16,9 +16,15 @@ export DOCKER_SOCKET_GID="$(stat -c '%g' /var/run/docker.sock)"
 docker compose up -d
 ```
 
+To check the container:
+
+```bash
+docker compose ps
+```
+
 ## Podman Quadlet
 
-Download the Quadlet files into your user systemd unit directory:
+To run the agent as a rootless Podman systemd user service:
 
 ```bash
 mkdir -p ~/.config/containers/systemd
@@ -26,11 +32,7 @@ curl -fsSL https://raw.githubusercontent.com/enderdash-com/deploy/main/agent/qua
   -o ~/.config/containers/systemd/enderdash-agent.container
 curl -fsSL https://raw.githubusercontent.com/enderdash-com/deploy/main/agent/quadlet/enderdash-agent-data.volume \
   -o ~/.config/containers/systemd/enderdash-agent-data.volume
-```
 
-Write the persistent environment file, then reload and start the units:
-
-```bash
 cat > ~/.config/containers/systemd/enderdash-agent.env <<'EOF'
 ENDERDASH_AGENT_KEY=<agentKey>
 EOF
@@ -41,15 +43,20 @@ systemctl --user daemon-reload
 systemctl --user enable --now enderdash-agent.service
 ```
 
-## Kubernetes Kustomize
-
-Create the namespace and agent key Secret:
+To check the service:
 
 ```bash
-kubectl create namespace enderdash --dry-run=client -o yaml | kubectl apply -f -
+systemctl --user status enderdash-agent.service
+```
+
+## Kubernetes Kustomize
+
+Create the namespace and Secret:
+
+```bash
+kubectl create namespace enderdash
 kubectl -n enderdash create secret generic enderdash-agent \
-  --from-literal=agentKey='<agentKey>' \
-  --dry-run=client -o yaml | kubectl apply -f -
+  --from-literal=agentKey='<agentKey>'
 ```
 
 Install the read-only manifests:
@@ -58,25 +65,30 @@ Install the read-only manifests:
 kubectl apply -k 'https://github.com/enderdash-com/deploy//agent/kustomize/base?ref=main'
 ```
 
-Use operator mode only for clusters where EnderDash should run Kubernetes
-mutations such as restarts, scaling, exec, port-forward, debug containers, and
-YAML apply or delete actions:
+Install operator mode instead when EnderDash should be allowed to run actions
+such as restarts, scaling, exec, port-forward, debug containers, and YAML apply
+or delete:
 
 ```bash
 kubectl apply -k 'https://github.com/enderdash-com/deploy//agent/kustomize/operator?ref=main'
 ```
 
+To check the deployment:
+
+```bash
+kubectl -n enderdash get pods -l app.kubernetes.io/name=enderdash-agent
+```
+
 ## Helm
 
-Helm charts are published separately:
+The Helm chart is published from the
+[`enderdash-com/helm-charts`](https://github.com/enderdash-com/helm-charts)
+repository.
 
 ```bash
 helm repo add enderdash https://charts.enderdash.com
 helm repo update
-helm upgrade --install enderdash-agent enderdash/enderdash-agent \
+helm install enderdash-agent enderdash/enderdash-agent \
   --namespace enderdash \
-  --create-namespace \
-  --set agentKeySecret.name=enderdash-agent \
-  --set agentKeySecret.key=agentKey \
   --set rbac.mode=readonly
 ```
