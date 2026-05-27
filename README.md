@@ -28,12 +28,15 @@ curl -fsSL https://raw.githubusercontent.com/enderdash-com/deploy/main/agent/qua
   -o ~/.config/containers/systemd/enderdash-agent-data.volume
 ```
 
-Set `ENDERDASH_AGENT_KEY` in the user service environment, then reload and start
-the unit:
+Write the persistent environment file, then reload and start the units:
 
 ```bash
-export ENDERDASH_AGENT_KEY='<agentKey>'
-systemctl --user import-environment ENDERDASH_AGENT_KEY
+cat > ~/.config/containers/systemd/enderdash-agent.env <<'EOF'
+ENDERDASH_AGENT_KEY=<agentKey>
+EOF
+chmod 600 ~/.config/containers/systemd/enderdash-agent.env
+
+systemctl --user enable --now podman.socket
 systemctl --user daemon-reload
 systemctl --user enable --now enderdash-agent.service
 ```
@@ -43,15 +46,16 @@ systemctl --user enable --now enderdash-agent.service
 Create the namespace and agent key Secret:
 
 ```bash
-kubectl create namespace enderdash
+kubectl create namespace enderdash --dry-run=client -o yaml | kubectl apply -f -
 kubectl -n enderdash create secret generic enderdash-agent \
-  --from-literal=agentKey='<agentKey>'
+  --from-literal=agentKey='<agentKey>' \
+  --dry-run=client -o yaml | kubectl apply -f -
 ```
 
 Install the read-only manifests:
 
 ```bash
-kubectl apply -k https://github.com/enderdash-com/deploy//agent/kustomize/base?ref=main
+kubectl apply -k 'https://github.com/enderdash-com/deploy//agent/kustomize/base?ref=main'
 ```
 
 Use operator mode only for clusters where EnderDash should run Kubernetes
@@ -59,7 +63,7 @@ mutations such as restarts, scaling, exec, port-forward, debug containers, and
 YAML apply or delete actions:
 
 ```bash
-kubectl apply -k https://github.com/enderdash-com/deploy//agent/kustomize/operator?ref=main
+kubectl apply -k 'https://github.com/enderdash-com/deploy//agent/kustomize/operator?ref=main'
 ```
 
 ## Helm

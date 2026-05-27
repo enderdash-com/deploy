@@ -1,8 +1,7 @@
 [Container]
 Image=ghcr.io/enderdash-com/enderdash-agent:latest
 ContainerName=enderdash-agent
-Environment=ENDERDASH_AGENT_KEY=${ENDERDASH_AGENT_KEY}
-Environment=ENDERDASH_SIGNALING_URL=${ENDERDASH_SIGNALING_URL}
+EnvironmentFile=enderdash-agent.env
 GroupAdd=keep-groups
 Volume=enderdash-agent-data.volume:/enderdash/data
 Volume=%t/podman/podman.sock:/run/podman/podman.sock
