@@ -11,8 +11,9 @@ To run the agent with Docker Compose:
 
 ```bash
 curl -fsSLO https://raw.githubusercontent.com/enderdash-com/deploy/main/agent/compose.yaml
-export ENDERDASH_AGENT_KEY='<agentKey>'
-export DOCKER_SOCKET_GID="$(stat -c '%g' /var/run/docker.sock)"
+cat > .env <<'EOF'
+ENDERDASH_AGENT_KEY=<agentKey>
+EOF
 docker compose up -d
 ```
 
