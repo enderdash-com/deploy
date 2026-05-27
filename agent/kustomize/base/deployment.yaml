@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: enderdash-agent
+  labels:
+    app.kubernetes.io/name: enderdash-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: enderdash-agent
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: enderdash-agent
+    spec:
+      serviceAccountName: enderdash-agent
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: agent
+          image: ghcr.io/enderdash-com/enderdash-agent:latest
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          env:
+            - name: ENDERDASH_AGENT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: enderdash-agent
+                  key: agentKey
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 512Mi
+          volumeMounts:
+            - name: data
+              mountPath: /enderdash/data
+      volumes:
+        - name: data
+          emptyDir:
+            sizeLimit: 1Gi

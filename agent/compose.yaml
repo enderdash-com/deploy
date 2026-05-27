@@ -1,0 +1,16 @@
+services:
+  enderdash-agent:
+    image: ghcr.io/enderdash-com/enderdash-agent:latest
+    container_name: enderdash-agent
+    restart: unless-stopped
+    environment:
+      ENDERDASH_AGENT_KEY: ${ENDERDASH_AGENT_KEY:?set ENDERDASH_AGENT_KEY}
+      ENDERDASH_SIGNALING_URL: ${ENDERDASH_SIGNALING_URL:-}
+    group_add:
+      - ${DOCKER_SOCKET_GID:?set DOCKER_SOCKET_GID to the group id of /var/run/docker.sock}
+    volumes:
+      - enderdash-agent-data:/enderdash/data
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  enderdash-agent-data:
