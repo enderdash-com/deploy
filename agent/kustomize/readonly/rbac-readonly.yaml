@@ -24,16 +24,3 @@ rules:
   - apiGroups: ["storage.k8s.io"]
     resources: ["storageclasses"]
     verbs: ["get", "list", "watch"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: enderdash-agent
-subjects:
-  - kind: ServiceAccount
-    name: enderdash-agent
-    namespace: enderdash
-roleRef:
-  kind: ClusterRole
-  name: enderdash-agent
-  apiGroup: rbac.authorization.k8s.io

@@ -4,5 +4,5 @@ namespace: enderdash
 resources:
   - namespace.yaml
   - service-account.yaml
-  - rbac-readonly.yaml
+  - rbac.yaml
   - deployment.yaml

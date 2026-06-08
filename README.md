@@ -60,18 +60,21 @@ kubectl -n enderdash create secret generic enderdash-agent \
   --from-literal=agentKey='<agentKey>'
 ```
 
-Install the read-only manifests:
+Install the manifests:
 
 ```bash
 kubectl apply -k 'https://github.com/enderdash-com/deploy//agent/kustomize/base?ref=main'
 ```
 
-Install operator mode instead when EnderDash should be allowed to run actions
-such as restarts, scaling, exec, port-forward, debug containers, and YAML apply
-or delete:
+The default install grants EnderDash cluster-wide Kubernetes permissions so it
+can manage workloads, exec sessions, port-forwards, debug containers, and YAML
+apply or delete operations.
+
+Install the read-only overlay instead when you want to restrict EnderDash to
+inventory and log access:
 
 ```bash
-kubectl apply -k 'https://github.com/enderdash-com/deploy//agent/kustomize/operator?ref=main'
+kubectl apply -k 'https://github.com/enderdash-com/deploy//agent/kustomize/readonly?ref=main'
 ```
 
 To check the deployment:
@@ -90,6 +93,5 @@ repository.
 helm repo add enderdash https://charts.enderdash.com
 helm repo update
 helm install enderdash-agent enderdash/enderdash-agent \
-  --namespace enderdash \
-  --set rbac.mode=readonly
+  --namespace enderdash
 ```

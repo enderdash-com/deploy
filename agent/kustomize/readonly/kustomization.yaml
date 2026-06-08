@@ -3,4 +3,4 @@ kind: Kustomization
 resources:
   - ../base
 patches:
-  - path: rbac-operator.yaml
+  - path: rbac-readonly.yaml
