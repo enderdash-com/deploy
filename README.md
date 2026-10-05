@@ -95,3 +95,8 @@ helm repo update
 helm install enderdash-agent enderdash/enderdash-agent \
   --namespace enderdash
 ```
+
+## Contributing and support
+
+Read [the contribution guide](CONTRIBUTING.md) for development and review.
+Use [the support guide](SUPPORT.md) for questions and issue routing.
