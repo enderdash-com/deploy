@@ -1,8 +1,8 @@
-# EnderDash deploy
+# Enderdash deploy
 
-Public deployment files for the EnderDash standalone agent.
+Public deployment files for the Enderdash standalone agent.
 
-Before you begin, copy the agent key from your EnderDash server setup page.
+Before you begin, copy the agent key from your Enderdash server setup page.
 Replace `<agentKey>` in the examples with that value.
 
 ## Docker Compose
@@ -66,11 +66,11 @@ Install the manifests:
 kubectl apply -k 'https://github.com/enderdash-com/deploy//agent/kustomize/base?ref=main'
 ```
 
-The default install grants EnderDash cluster-wide Kubernetes permissions so it
+The default install grants Enderdash cluster-wide Kubernetes permissions so it
 can manage workloads, exec sessions, port-forwards, debug containers, and YAML
 apply or delete operations.
 
-Install the read-only overlay instead when you want to restrict EnderDash to
+Install the read-only overlay instead when you want to restrict Enderdash to
 inventory and log access:
 
 ```bash
